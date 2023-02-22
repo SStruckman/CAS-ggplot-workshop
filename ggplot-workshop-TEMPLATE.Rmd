@@ -246,7 +246,7 @@ To create the bones of the plot, we will need `geom_col()` like before, but we w
 ```{r}
 ggplot(bar_data, aes(x = genus_species, y = mean_value, fill = diet)) +
   facet_wrap(~summary_var) + # create separate panels for each trait
-  geom_col() + # separate columns for each age group
+  geom_col() + # separate columns for each diet group
   geom_errorbar(aes(xmin=mean_value-se_value, 
                     xmax=mean_value+se_value))
 ```
@@ -386,49 +386,12 @@ Additionally, aRtists everywhere are using R to make ridiculously cool pieces of
 
 
 
-# Bonus
+# Sandbox
 
-What's *especially* neat about `ggplot2` is that it interfaces seamlessly with `sf`, a package for spatial data wrangling, analysis, and viz.`sf` treats its spatial objects as `data.frames` meaning.... we can use all of the magic & power of the `tidyverse` to play with the data! Plus, these data look just like any other data.frame, except attached to them is a column `geometry` that houses the coordinate information for the observation!
-
-Below, we'll take the the EPA air quality data Ellie & Dakoeta gathered and make it spatial for visualization!
-
-```{r warning = FALSE}
-# install.packages("sf") # if you haven't done so already!
-library(sf)
-
-# read in the data
-epa <- readRDS("./in-data/alldata_1980_2020.RDS")
-
-# let's explore a bit
-dim(epa) # view dimensions of the df
-glimpse(epa) # view the data structure and first few observations
-str(epa) # view data structure of df
-colnames(epa) # view the columns of df
-
-# give this data.frame real dates!
-dates <- data.frame(str_split_fixed(epa$date_local, "-", n = 3)) %>%
-  rename(year = X1,
-         month = X2,
-         day = X3)
-
-# bind year, month, day columns to epa data.frame
-epa <- bind_cols(dates, epa)
-
-# build_spatial 
-epa_sf <- st_as_sf(x = epa, 
-                        coords = c("longitude", "latitude"),
-                        crs = "+proj=aea +lat_0=0 +lon_0=-120 +lat_1=34 +lat_2=40.5 +x_0=0 +y_0=-4000000 +datum=NAD83 +units=m +no_defs")
-
-glimpse(epa_sf) # notice the new column, geometry
-
-# visualize
-epa_sf %>% filter(year == 2019, event_type == "None") %>% 
-ggplot(.) +
-  geom_sf(aes(color = aqi)) +
-  theme_bw()
+```{r}
+# whatever code you want goes here!
 ```
 
-There are many, many ways to make maps beautiful in `ggplot` using `sf`. Anyone who says R isn't built for spatial viz just hasn't tried hard enough--check out [this](https://timogrossenbacher.ch/2019/04/bivariate-maps-with-ggplot2-and-sf/) if you don't believe me (just about the most gorgeous, creative, and well-built map I've ever seen).
 
 
 
